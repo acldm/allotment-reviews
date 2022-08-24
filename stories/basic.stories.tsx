@@ -199,6 +199,10 @@ export const Reset: Story<AllotmentProps> = (args) => {
         <Allotment ref={ref} {...args}>
           <Content />
           <Content />
+          <Content />
+          <Content />
+          <Content />
+          <Content />
         </Allotment>
       </div>
     </div>

@@ -728,6 +728,7 @@ export class SplitView extends EventEmitter implements Disposable {
    */
   public distributeViewSizes(): void {
     const flexibleViewItems: ViewItem[] = [];
+    // 总长度
     let flexibleSize = 0;
 
     for (const item of this.viewItems) {
@@ -737,8 +738,10 @@ export class SplitView extends EventEmitter implements Disposable {
       }
     }
 
+    // 平均长度
     const size = Math.floor(flexibleSize / flexibleViewItems.length);
 
+    // 分配平均长度，限制于边界值内
     for (const item of flexibleViewItems) {
       item.size = clamp(size, item.minimumSize, item.maximumSize);
     }

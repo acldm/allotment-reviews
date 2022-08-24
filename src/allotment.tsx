@@ -143,6 +143,7 @@ const Allotment = forwardRef<AllotmentHandle, AllotmentProps>(
     const layoutService = useRef<LayoutService>(new LayoutService());
     const views = useRef<PaneView[]>([]);
 
+    // 已初始化尺寸
     const [dimensionsInitialized, setDimensionsInitialized] = useState(false);
 
     if (process.env.NODE_ENV !== "production" && sizes) {
@@ -174,7 +175,6 @@ const Allotment = forwardRef<AllotmentHandle, AllotmentProps>(
           onReset();
         } else {
           splitViewRef.current?.distributeViewSizes();
-
           for (let index = 0; index < views.current.length; index++) {
             resizeToPreferredSize(index);
           }
@@ -213,6 +213,7 @@ const Allotment = forwardRef<AllotmentHandle, AllotmentProps>(
             descriptor: {
               size: defaultSizes.reduce((a, b) => a + b, 0),
               views: defaultSizes.map((size, index) => {
+                // view对应props
                 const props = splitViewPropsRef.current.get(
                   previousKeys.current[index]
                 );
@@ -240,6 +241,7 @@ const Allotment = forwardRef<AllotmentHandle, AllotmentProps>(
           }),
       };
 
+      // 创建窗口管理器
       splitViewRef.current = new SplitView(
         containerRef.current,
         options,
@@ -297,10 +299,14 @@ const Allotment = forwardRef<AllotmentHandle, AllotmentProps>(
         const keys = childrenArray.map((child) => child.key as string);
         const panes = [...previousKeys.current];
 
+        // 新增页面key
         const enter = keys.filter((key) => !previousKeys.current.includes(key));
+        // 需更新页面key
         const update = keys.filter((key) => previousKeys.current.includes(key));
+        // 退出页面key
         const exit = previousKeys.current.map((key) => !keys.includes(key));
 
+        // 从尾至头移除标记删除页面
         for (let index = exit.length - 1; index >= 0; index--) {
           if (exit[index]) {
             splitViewRef.current?.removeView(index);
@@ -309,7 +315,9 @@ const Allotment = forwardRef<AllotmentHandle, AllotmentProps>(
           }
         }
 
+        // 新页面处理
         for (const enterKey of enter) {
+          // 新页面对应prop
           const props = splitViewPropsRef.current.get(enterKey);
 
           const view = new PaneView(layoutService.current, {
@@ -341,8 +349,11 @@ const Allotment = forwardRef<AllotmentHandle, AllotmentProps>(
             0,
             view
           );
+
+          // 太多删除操作，过于繁琐
         }
 
+        // panes处理后与keys对比，不一致则调整顺序
         // Move panes if order has changed
         while (!isEqual(keys, panes)) {
           for (const [i, key] of keys.entries()) {
@@ -355,6 +366,7 @@ const Allotment = forwardRef<AllotmentHandle, AllotmentProps>(
                 i
               );
 
+              // 调整panes顺序，影响后续的顺序对比
               const tempKey = panes[index];
               panes.splice(index, 1);
               panes.splice(i, 0, tempKey);
@@ -364,6 +376,7 @@ const Allotment = forwardRef<AllotmentHandle, AllotmentProps>(
           }
         }
 
+        // 调整新页面尺寸
         for (const enterKey of enter) {
           const index = keys.findIndex((key) => key === enterKey);
 
@@ -374,6 +387,7 @@ const Allotment = forwardRef<AllotmentHandle, AllotmentProps>(
           }
         }
 
+        // 统一更新新页面和旧有页面
         for (const updateKey of [...enter, ...update]) {
           const props = splitViewPropsRef.current.get(updateKey);
           const index = keys.findIndex((key) => key === updateKey);
@@ -389,6 +403,7 @@ const Allotment = forwardRef<AllotmentHandle, AllotmentProps>(
           }
         }
 
+        // 更新页面的props
         for (const updateKey of update) {
           const props = splitViewPropsRef.current.get(updateKey);
           const index = keys.findIndex((key) => key === updateKey);
@@ -426,6 +441,7 @@ const Allotment = forwardRef<AllotmentHandle, AllotmentProps>(
         }
 
         if (enter.length > 0 || exit.length > 0) {
+          // 记录keys值，以备下次接受到新keys后与之对比处理
           previousKeys.current = keys;
         }
       }

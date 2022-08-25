@@ -214,6 +214,7 @@ abstract class ViewItem {
     }
 
     if (visible) {
+      // visible为true，还原记录的size
       this.size = clamp(
         this._cachedVisibleSize!,
         this.viewMinimumSize,
@@ -221,10 +222,12 @@ abstract class ViewItem {
       );
       this._cachedVisibleSize = undefined;
     } else {
+      // visible为false, size清为0
       this._cachedVisibleSize = typeof size === "number" ? size : this.size;
       this.size = 0;
     }
 
+    // 更新样式
     this.container.classList.toggle(styles.visible, visible);
     this.container.classList.toggle("split-view-view-visible", visible);
 
@@ -251,11 +254,13 @@ abstract class ViewItem {
     this.container.style.pointerEvents = enabled ? "" : "none";
   }
 
+  // offset偏移值
   layout(offset: number): void {
     this.layoutContainer(offset);
     this.view.layout(this.size, offset);
   }
 
+  // 调整位置的方法,垂直与横向实现不同
   abstract layoutContainer(offset: number): void;
 }
 

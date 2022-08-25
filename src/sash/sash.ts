@@ -229,6 +229,7 @@ export class Sash extends EventEmitter implements Disposable {
       event.preventDefault();
 
       this.el.classList.remove("sash-active", styles.active);
+      // 取消预执行防抖函数的执行
       this.hoverDelayer.cancel();
       this.emit("end");
 
@@ -261,6 +262,7 @@ export class Sash extends EventEmitter implements Disposable {
   };
 
   /**
+   * 计算并设置sash的位置大小
    * Layout the sash. The sash will size and position itself
    * based on its provided {@link SashLayoutProvider layout provider}.
    */
@@ -299,6 +301,7 @@ export class Sash extends EventEmitter implements Disposable {
     }
   }
 
+  // 销毁周期方法
   public dispose(): void {
     this.el.removeEventListener("pointerdown", this.onPointerStart);
     this.el.removeEventListener("dblclick", this.onPointerDoublePress);

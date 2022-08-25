@@ -2,10 +2,12 @@ import { endsWith } from "../helpers/string";
 import { LayoutService } from "../layout-service";
 import { LayoutPriority, View } from "../split-view";
 
+// 窗口布局实际尺寸计算,策略模式
 export interface Layout {
   getPreferredSize: () => number | undefined;
 }
 
+// 像素布局
 export class PixelLayout implements Layout {
   private size: number;
 
@@ -18,6 +20,7 @@ export class PixelLayout implements Layout {
   }
 }
 
+// flex布局
 export class ProportionLayout implements Layout {
   private proportion: number;
   private layoutService: LayoutService;
@@ -32,6 +35,7 @@ export class ProportionLayout implements Layout {
   }
 }
 
+// 无布局
 export class NullLayout implements Layout {
   public getPreferredSize() {
     return undefined;
@@ -62,6 +66,7 @@ export class PaneView implements View {
     return this.layoutStrategy.getPreferredSize();
   }
 
+  // 过于多余的智能补全，提升了灵活性，损失简约性
   set preferredSize(preferredSize: number | string | undefined) {
     if (typeof preferredSize === "number") {
       this.layoutStrategy = new PixelLayout(preferredSize);

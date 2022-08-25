@@ -240,7 +240,6 @@ export const CustomReset: Story<AllotmentProps> = (args) => {
   );
 };
 CustomReset.args = {};
-
 export const Resize: Story<AllotmentProps> = (args) => {
   const defaultSizes = [60, 40];
   const [sizes, setSizes] = useState(defaultSizes);

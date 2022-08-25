@@ -536,7 +536,7 @@ Allotment.displayName = "Allotment";
 
 /**
  * Set sash size. This is set in both css and js and this function keeps the two in sync.
- *
+ * sashSize有大小限制
  * @param sashSize Sash size in pixels
  */
 export function setSashSize(sashSize: number) {

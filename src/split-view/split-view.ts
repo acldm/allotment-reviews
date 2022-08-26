@@ -462,6 +462,7 @@ export class SplitView extends EventEmitter implements Disposable {
               { orientation: Orientation.Vertical }
             );
 
+      // 预处理sash事件参数统一格式并转发给后续流程，屏蔽了用户操作差异。
       const sashEventMapper =
         this.orientation === Orientation.Vertical
           ? (e: BaseSashEvent) => ({
@@ -487,6 +488,7 @@ export class SplitView extends EventEmitter implements Disposable {
         this.onSashEnd(this.sashItems.findIndex((item) => item.sash === sash))
       );
 
+      // 还原sash的初始位置
       sash.on("reset", () => {
         const index = this.sashItems.findIndex((item) => item.sash === sash);
         const upIndexes = range(index, -1, -1);
@@ -516,6 +518,7 @@ export class SplitView extends EventEmitter implements Disposable {
       this.sashItems.splice(index - 1, 0, sashItem);
     }
 
+    // 从构造函数调用时跳过布局阶段
     if (!skipLayout) {
       this.relayout();
     }
@@ -775,6 +778,8 @@ export class SplitView extends EventEmitter implements Disposable {
     lowPriorityIndexes?: number[],
     highPriorityIndexes?: number[]
   ): void {
+    // 内容总尺寸
+    // this.size 使用者指定defaultSizes
     const contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
 
     this.resize(
@@ -912,6 +917,7 @@ export class SplitView extends EventEmitter implements Disposable {
     }
   };
 
+  // 根据sash index计算位置，由views尺寸叠加确定
   private getSashPosition(sash: Sash): number {
     let position = 0;
 
@@ -944,6 +950,7 @@ export class SplitView extends EventEmitter implements Disposable {
     const upIndexes = range(index, -1, -1);
     const downIndexes = range(index + 1, this.viewItems.length);
 
+    // 调整具有优先级的视图顺序
     if (highPriorityIndexes) {
       for (const index of highPriorityIndexes) {
         pushToStart(upIndexes, index);
@@ -958,12 +965,15 @@ export class SplitView extends EventEmitter implements Disposable {
       }
     }
 
+    // 位于左边的视图项
     const upItems = upIndexes.map((i) => this.viewItems[i]);
     const upSizes = upIndexes.map((i) => sizes[i]);
 
+    // 位于右边的视图项
     const downItems = downIndexes.map((i) => this.viewItems[i]);
     const downSizes = downIndexes.map((i) => sizes[i]);
 
+    // 左视图列最小尺寸与当前尺寸差值和
     const minDeltaUp = upIndexes.reduce(
       (r, i) => r + (this.viewItems[i].minimumSize - sizes[i]),
       0
@@ -990,9 +1000,11 @@ export class SplitView extends EventEmitter implements Disposable {
             0
           );
 
+    // 选取最小最大差异
     const minDelta = Math.max(minDeltaUp, minDeltaDown, overloadMinDelta);
     const maxDelta = Math.min(maxDeltaDown, maxDeltaUp, overloadMaxDelta);
 
+    // 是否需要折叠
     let snapped = false;
 
     if (snapBefore) {
@@ -1009,6 +1021,7 @@ export class SplitView extends EventEmitter implements Disposable {
       snapView.setVisible(visible, snapAfter.size);
     }
 
+    // 若需要折叠，则需重新计算布局
     if (snapped) {
       return this.resize(
         index,
@@ -1026,12 +1039,14 @@ export class SplitView extends EventEmitter implements Disposable {
     for (let i = 0, deltaUp = delta; i < upItems.length; i++) {
       const item = upItems[i];
 
+      // 按顺序照死了撑
       const size = clamp(
         upSizes[i] + deltaUp,
         item.minimumSize,
         item.maximumSize
       );
 
+      // 计算实际占用的余量空间
       const viewDelta = size - upSizes[i];
 
       deltaUp -= viewDelta;
@@ -1059,6 +1074,7 @@ export class SplitView extends EventEmitter implements Disposable {
 
   private distributeEmptySpace(lowPriorityIndex?: number): void {
     const contentSize = this.viewItems.reduce((r, i) => r + i.size, 0);
+    // 未分配空间
     let emptyDelta = this.size - contentSize;
 
     const indexes = range(this.viewItems.length - 1, -1, -1);

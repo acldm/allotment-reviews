@@ -108,6 +108,7 @@ export class PaneView implements View {
         ? options.maximumSize
         : Number.POSITIVE_INFINITY;
 
+    // 与上段重复，可合并
     if (typeof options.preferredSize === "number") {
       this.layoutStrategy = new PixelLayout(options.preferredSize);
     } else if (typeof options.preferredSize === "string") {

@@ -6,6 +6,7 @@ import {
   Allotment,
   AllotmentHandle,
   AllotmentProps,
+  LayoutPriority,
   setSashSize,
 } from "../src";
 import { range } from "../src/helpers/array";
@@ -25,6 +26,39 @@ export const Simple: Story = () => (
     </Allotment>
   </div>
 );
+
+export const Snap: Story = () => (
+  <div className={styles.container}>
+    <Allotment vertical snap>
+      <Content />
+      <Content />
+    </Allotment>
+  </div>
+);
+
+export const Priority: Story<{
+  prioritys: Array<LayoutPriority>;
+  sizes: Array<number>;
+}> = ({ prioritys, sizes }) => (
+  <div className={styles.container}>
+    <Allotment proportionalLayout={false}>
+      {new Array(3).fill(0).map((_, index) => {
+        return (
+          <Allotment.Pane
+            priority={prioritys[index] ?? LayoutPriority.Low}
+            preferredSize={sizes[index] ?? 100}
+          >
+            <Content />
+          </Allotment.Pane>
+        );
+      })}
+    </Allotment>
+  </div>
+);
+Priority.args = {
+  prioritys: [LayoutPriority.High, LayoutPriority.High, LayoutPriority.High],
+  sizes: [200, 100, 200],
+};
 
 const Template: Story<AllotmentProps & { numViews: number }> = ({
   numViews,
